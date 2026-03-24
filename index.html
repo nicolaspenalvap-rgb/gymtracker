@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GymTracker">
+<title>GYM TRACKER</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{background:#000;color:#fff;font-family:'Barlow',sans-serif;padding-bottom:72px}
+input,button,select,textarea{font-family:'Barlow',sans-serif}
+button{cursor:pointer;border:none;background:none;color:inherit}
+:root{--s:#0a0a0a;--l:#141414;--l2:#1e1e1e;--mu:#333;--di:#555;--mi:#888}
+::-webkit-scrollbar{width:2px;height:2px}
+::-webkit-scrollbar-track{background:#000}
+::-webkit-scrollbar-thumb{background:#222}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .4s}
+#splash.out{opacity:0;pointer-events:none}
+.splash-icon{font-size:48px;animation:bounce .6s ease infinite alternate}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-10px)}}
+.splash-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:42px;letter-spacing:6px;text-transform:uppercase}
+.splash-bar{width:120px;height:1px;background:#1a1a1a;overflow:hidden}
+.splash-fill{height:100%;background:#fff;animation:sl 1.4s ease-in-out infinite}
+@keyframes sl{0%{width:0;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0;margin-left:100%}}
+.splash-txt{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#444}
+
+/* AUTH */
+#authScreen{position:fixed;inset:0;background:#000;z-index:900;display:none;flex-direction:column;overflow-y:auto}
+#authScreen.show{display:flex}
+.auth-hero{padding:52px 32px 32px;display:flex;flex-direction:column;align-items:center;gap:12px;border-bottom:1px solid var(--l)}
+.auth-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:48px;letter-spacing:6px;text-transform:uppercase}
+.auth-sub{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--di)}
+.auth-tabs{display:flex;border-bottom:1px solid var(--l)}
+.auth-tab{flex:1;padding:14px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--di);border-bottom:2px solid transparent;text-align:center}
+.auth-tab.active{color:#fff;border-bottom-color:#fff}
+.auth-form{padding:28px 24px;display:flex;flex-direction:column;gap:14px;max-width:400px;width:100%;margin:0 auto}
+.auth-field{display:flex;flex-direction:column;gap:6px}
+.auth-label{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--di)}
+.auth-input{background:var(--s);border:1px solid var(--l2);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:18px;padding:13px 16px;border-radius:3px;outline:none;width:100%;letter-spacing:1px}
+.auth-input:focus{border-color:#fff}
+.auth-input::placeholder{color:var(--mu);font-weight:400;font-size:14px;letter-spacing:.5px}
+.auth-btn{background:#fff;color:#000;padding:15px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:15px;letter-spacing:3px;text-transform:uppercase;border-radius:3px;width:100%}
+.auth-btn:hover{background:#e8e8e8}
+.auth-btn:disabled{background:#222;color:#555;cursor:not-allowed}
+.auth-err{font-size:12px;color:#f87171;text-align:center}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:200;background:#000;border-bottom:1px solid var(--l);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.hdr-logo{display:flex;align-items:center;gap:10px}
+.hdr-icon{width:30px;height:30px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px}
+.hdr-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:17px;letter-spacing:3px;text-transform:uppercase}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-user{display:flex;align-items:center;gap:8px;cursor:pointer}
+.hdr-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid var(--l2)}
+.hdr-avatar-placeholder{width:32px;height:32px;border-radius:50%;background:var(--l2);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:14px;text-transform:uppercase;border:1px solid var(--l2)}
+.hdr-username{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:13px;letter-spacing:1.5px;text-transform:uppercase}
+.week-ctrl{display:flex;align-items:center;gap:4px;background:var(--s);border:1px solid var(--l2);border-radius:3px;padding:4px 8px}
+.wnum-lbl{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--di)}
+.wnum{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:17px;min-width:18px;text-align:center}
+.warr{color:var(--di);font-size:15px;width:18px;height:18px;display:flex;align-items:center;justify-content:center}
+.warr:hover{color:#fff}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:#000;border-top:1px solid var(--l);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+.nb{flex:1;padding:9px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Barlow Condensed',sans-serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--mu)}
+.nb.active{color:#fff}
+.nb .ni{font-size:18px}
+
+/* PAGES */
+.pg{display:none}
+.pg.active{display:block}
+
+/* CLOUD STATUS */
+.cs{display:flex;align-items:center;gap:7px;padding:6px 16px;background:var(--s);border-bottom:1px solid var(--l);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--di)}
+.cd{width:5px;height:5px;border-radius:50%;background:var(--mu);flex-shrink:0}
+.cd.ok{background:#4ade80}.cd.sy{background:#facc15;animation:pu 1s ease-in-out infinite}.cd.er{background:#f87171}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* PROG */
+.prog-bar{background:var(--s);border-bottom:1px solid var(--l);padding:8px 16px;display:flex;align-items:center;gap:10px}
+.pt{flex:1;height:1px;background:var(--l2)}
+.pf{height:100%;background:#fff;transition:width .5s}
+.pl{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;color:var(--mi);white-space:nowrap}
+.pc{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:14px;color:#fff;white-space:nowrap}
+
+/* STATS ROW */
+.sr{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--l);border-bottom:1px solid var(--l)}
+.sc2{background:#000;padding:12px 14px}
+.sn{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px;line-height:1;letter-spacing:-1px}
+.sl{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--di);margin-top:3px}
+
+/* DAY TABS */
+.dtabs{display:flex;border-bottom:1px solid var(--l);overflow-x:auto;scrollbar-width:none;background:#000}
+.dtabs::-webkit-scrollbar{display:none}
+.dt{padding:11px 14px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);border-bottom:2px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.dt.active{color:#fff;border-bottom-color:#fff}
+.dt .dp{font-size:8px;background:var(--l2);border-radius:2px;padding:1px 5px;color:var(--di)}
+.dt.active .dp{background:rgba(255,255,255,.12);color:#fff}
+
+/* DAY HDR */
+.dhdr{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--l)}
+.dname{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:38px;line-height:1;letter-spacing:-1px;text-transform:uppercase}
+.dfocus{font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--di);margin-top:4px}
+.dcnt{text-align:right}
+.dcnt-n{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px;line-height:1}
+.dcnt-l{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--di);margin-top:3px}
+
+/* EXERCISE */
+.exl{display:flex;flex-direction:column;gap:1px;background:var(--l);margin-top:1px}
+.exc{background:#000;padding:13px 14px;display:flex;align-items:center;gap:11px;border-left:2px solid transparent}
+.exc:hover{background:var(--s)}
+.exc.done{background:var(--s);border-left-color:#fff}
+.exn2{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;color:var(--mu);width:26px;flex-shrink:0;line-height:1}
+.exc.done .exn2{color:#fff}
+.exb{flex:1;min-width:0}
+.exname{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:.5px;text-transform:uppercase;color:var(--di);margin-bottom:3px}
+.exc.done .exname{color:#fff}
+.extags{display:flex;gap:7px;flex-wrap:wrap}
+.xt{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mu)}
+.xt.hi{color:var(--mi)}.xt.rec{color:#fff}
+.exinps{display:flex;gap:5px;flex-shrink:0}
+.xiw{display:flex;flex-direction:column;gap:2px;align-items:center}
+.xil{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--mu)}
+.xi{background:var(--s);border:1px solid var(--l2);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;width:58px;height:34px;text-align:center;border-radius:3px;outline:none}
+.xi:focus{border-color:var(--mi)}.xi.hv{border-color:#fff;color:#fff}
+.ckb{width:28px;height:28px;border-radius:50%;border:1px solid var(--l2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.exc.done .ckb{background:#fff;border-color:#fff;color:#000}
+.enr{display:flex;align-items:center;padding:5px 14px 10px calc(26px + 11px + 14px);border-left:2px solid transparent;background:#000}
+.exc.done+.enr{border-left-color:#fff;background:var(--s)}
+.eni{flex:1;background:none;border:none;border-bottom:1px solid var(--l2);color:var(--mi);font-size:11px;padding:3px 0;outline:none}
+.eni::placeholder{color:var(--mu)}
+.eni.hv{color:#fff;border-bottom-color:var(--mi)}
+.add-ex{margin:10px 18px;background:none;border:1px dashed var(--l2);width:calc(100% - 36px);padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--di);border-radius:3px;display:flex;align-items:center;justify-content:center;gap:6px}
+.add-ex:hover{border-color:#fff;color:#fff}
+
+/* TIMER */
+.timer-p{margin:14px 18px;border:1px solid var(--l2);background:var(--s);padding:18px}
+.th{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.tt{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--di)}
+.tpres{display:flex;gap:4px}
+.tp{background:var(--l2);border-radius:2px;padding:4px 8px;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mi)}
+.tp:hover{background:#222;color:#fff}.tp.ap{background:#fff;color:#000}
+.td{text-align:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:64px;line-height:1;letter-spacing:-2px;margin-bottom:4px}
+.ts{text-align:center;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--di);margin-bottom:14px}
+.ttr{height:2px;background:var(--l2);border-radius:1px;margin-bottom:14px;overflow:hidden}
+.tf{height:100%;background:#fff;transition:width .5s linear}
+.tbs{display:flex;gap:8px;justify-content:center}
+.tmain{background:#fff;color:#000;padding:10px 32px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:12px;letter-spacing:3px;text-transform:uppercase;border-radius:3px}
+.tgh{background:none;border:1px solid var(--l2);padding:10px 16px;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--di);border-radius:3px}
+.tgh:hover{border-color:#fff;color:#fff}
+
+/* SAVE */
+.save-s{padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.save-b{background:#fff;color:#000;padding:12px 24px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:14px;letter-spacing:3px;text-transform:uppercase;border-radius:3px;white-space:nowrap}
+.save-b:hover{background:#e8e8e8;transform:translateY(-1px)}
+.save-n{font-size:11px;color:var(--di);line-height:1.4}
+
+/* SEARCH BAR */
+.search-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--s);border-bottom:1px solid var(--l)}
+.search-input{flex:1;background:var(--l2);border:1px solid var(--l2);color:#fff;font-size:14px;padding:9px 14px;border-radius:20px;outline:none}
+.search-input:focus{border-color:var(--mi)}
+.search-input::placeholder{color:var(--mu)}
+.search-icon{font-size:16px;color:var(--di)}
+
+/* SOCIAL TABS */
+.social-hdr{display:flex;gap:1px;background:var(--l);border-bottom:1px solid var(--l)}
+.social-tab{flex:1;padding:12px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);border-bottom:2px solid transparent}
+.social-tab.active{color:#fff;border-bottom-color:#fff}
+.social-section{display:none}
+.social-section.active{display:block}
+
+/* FEED */
+.feed-item{padding:14px 16px;border-bottom:1px solid var(--l);display:flex;gap:12px;cursor:pointer}
+.feed-item:hover{background:var(--s)}
+.feed-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--l2)}
+.feed-avatar-ph{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:17px;flex-shrink:0;text-transform:uppercase;border:1px solid var(--l2)}
+.feed-body{flex:1;min-width:0}
+.feed-header{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.feed-user{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:14px;letter-spacing:1.5px;text-transform:uppercase}
+.feed-time{font-size:10px;color:var(--di)}
+.feed-text{font-size:13px;color:var(--mi);line-height:1.4}
+.feed-stats{display:flex;gap:12px;margin-top:6px}
+.feed-stat{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--di)}
+.feed-stat span{color:#fff;font-weight:600}
+.feed-empty{padding:48px 16px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--mu)}
+
+/* RANKING - SYMMETRY STYLE */
+.ranking-hero{background:var(--s);border-bottom:1px solid var(--l);padding:20px 16px}
+.ranking-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px}
+.ranking-sub{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--di)}
+.rank-tabs{display:flex;gap:1px;background:var(--l);border-bottom:1px solid var(--l)}
+.rank-tab{flex:1;padding:10px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);border-bottom:2px solid transparent}
+.rank-tab.active{color:#fff;border-bottom-color:#fff}
+.rank-list{padding:0}
+.rank-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--l);cursor:pointer}
+.rank-row:hover{background:var(--s)}
+.rank-row.me{background:rgba(255,255,255,.04);border-left:2px solid #fff}
+.rank-pos{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;width:36px;flex-shrink:0;text-align:center;color:var(--mu)}
+.rank-pos.g{color:#fbbf24}.rank-pos.s{color:#94a3b8}.rank-pos.b{color:#b45309}
+.rank-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--l2)}
+.rank-avatar-ph{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;flex-shrink:0;text-transform:uppercase}
+.rank-info{flex:1;min-width:0}
+.rank-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;letter-spacing:1.5px;text-transform:uppercase}
+.rank-meta{font-size:10px;color:var(--di);margin-top:2px}
+.rank-score{text-align:right}
+.rank-val{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;line-height:1}
+.rank-unit{font-size:9px;color:var(--di);letter-spacing:1px}
+.rank-badge{font-size:7px;letter-spacing:1.5px;background:#fff;color:#000;padding:1px 5px;border-radius:1px;margin-left:6px;vertical-align:middle}
+.rank-streak{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--di);margin-top:3px}
+.streak-fire{font-size:13px}
+
+/* USERS LIST */
+.user-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--l);cursor:pointer}
+.user-row:hover{background:var(--s)}
+.u-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--l2)}
+.u-avatar-ph{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;flex-shrink:0;text-transform:uppercase}
+.u-info{flex:1;min-width:0}
+.u-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;letter-spacing:1.5px;text-transform:uppercase}
+.u-meta{font-size:11px;color:var(--di);margin-top:2px}
+.follow-btn{background:var(--l2);border:1px solid var(--mu);border-radius:20px;padding:7px 16px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#fff;transition:all .15s;white-space:nowrap}
+.follow-btn:hover{border-color:#fff}
+.follow-btn.following{background:none;border-color:var(--l2);color:var(--di)}
+
+/* PROFILE PAGE */
+.profile-cover{height:120px;background:linear-gradient(135deg,#1a1a1a,#2a2a2a);position:relative}
+.profile-avatar-wrap{position:absolute;bottom:-30px;left:20px}
+.profile-avatar-img{width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #000}
+.profile-avatar-ph{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:30px;text-transform:uppercase;border:3px solid #000}
+.profile-upload-btn{position:absolute;bottom:0;right:0;width:24px;height:24px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer}
+.profile-info{padding:40px 20px 16px;border-bottom:1px solid var(--l)}
+.profile-name{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;letter-spacing:2px;text-transform:uppercase}
+.profile-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--l)}
+.pnum{background:#000;padding:14px;text-align:center;cursor:pointer}
+.pnum:hover{background:var(--s)}
+.pnum-n{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:26px;line-height:1}
+.pnum-l{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--di);margin-top:3px}
+.profile-streak{display:flex;align-items:center;gap:8px;padding:14px 20px;border-bottom:1px solid var(--l);background:var(--s)}
+.streak-count{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px}
+.streak-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--di)}
+
+/* RUTINAS */
+.routine-card{padding:14px 16px;border-bottom:1px solid var(--l)}
+.routine-card:hover{background:var(--s)}
+.rc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.rc-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;letter-spacing:1.5px;text-transform:uppercase}
+.rc-author{font-size:10px;color:var(--di)}
+.rc-days{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.rc-day{font-size:9px;letter-spacing:1.5px;background:var(--l2);border-radius:2px;padding:3px 7px;text-transform:uppercase;color:var(--mi)}
+.rc-actions{display:flex;gap:8px;margin-top:10px}
+.rc-btn{background:none;border:1px solid var(--l2);border-radius:3px;padding:6px 12px;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--di)}
+.rc-btn:hover{border-color:#fff;color:#fff}
+.rc-btn.primary{background:#fff;color:#000;border-color:#fff}
+
+/* SECTION TITLE */
+.stit{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;letter-spacing:2px;text-transform:uppercase;padding:18px 18px 12px;border-bottom:1px solid var(--l)}
+
+/* RECORDS */
+.rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1px;background:var(--l);margin:1px}
+.rc2{background:#000;padding:14px}
+.rc2-ex{font-size:9px;color:var(--di);margin-bottom:5px;line-height:1.3}
+.rc2-kg{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:30px;line-height:1}
+.rc2-kg.empty{color:var(--mu);font-size:22px}
+.rc2-meta{font-size:8px;color:var(--mu);margin-top:2px}
+.rec-day-h{padding:10px 14px 7px;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--di);border-bottom:1px solid var(--l)}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:500;display:none;align-items:flex-end}
+.modal-ov.open{display:flex}
+.modal{background:#0d0d0d;border-top:1px solid var(--l2);width:100%;max-height:90vh;overflow-y:auto;padding:18px;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.modal-tit{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;letter-spacing:2px;text-transform:uppercase}
+.mclose{font-size:20px;color:var(--di)}.mclose:hover{color:#fff}
+.modal-sec{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--di);margin:12px 0 7px}
+.minput{background:var(--s);border:1px solid var(--l2);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:11px 14px;border-radius:3px;outline:none;width:100%;margin-bottom:8px}
+.minput:focus{border-color:#fff}
+.mbtn{background:#fff;color:#000;padding:12px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;letter-spacing:3px;text-transform:uppercase;width:100%;margin-top:6px}
+.mbtn.ghost{background:none;border:1px solid var(--l2);color:var(--di)}
+.mbtn.ghost:hover{border-color:#fff;color:#fff}
+
+/* USER PROFILE MODAL */
+.um-cover{height:80px;background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:3px;position:relative;margin-bottom:36px}
+.um-avatar{position:absolute;bottom:-28px;left:16px;width:60px;height:60px;border-radius:50%;object-fit:cover;border:3px solid #0d0d0d}
+.um-avatar-ph{position:absolute;bottom:-28px;left:16px;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;text-transform:uppercase;border:3px solid #0d0d0d}
+.um-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--l);margin-bottom:14px}
+.um-stat{background:#0d0d0d;padding:10px;text-align:center}
+.um-stat-n{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px}
+.um-stat-l{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--di);margin-top:2px}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(12px);background:#fff;color:#000;padding:9px 20px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;opacity:0;pointer-events:none;transition:all .3s;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:380px){.xi{width:50px;font-size:14px}.dname{font-size:30px}}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="splash-icon">💪</div>
+  <div class="splash-title">Gym Tracker</div>
+  <div class="splash-bar"><div class="splash-fill"></div></div>
+  <div class="splash-txt" id="splashTxt">Cargando...</div>
+</div>
+
+<div id="authScreen">
+  <div class="auth-hero">
+    <div style="font-size:36px">💪</div>
+    <div class="auth-logo">Gym Tracker</div>
+    <div class="auth-sub">Entrena. Comparte. Supérate.</div>
+  </div>
+  <div class="auth-tabs">
+    <button class="auth-tab active" onclick="switchAuth('login')">Iniciar sesión</button>
+    <button class="auth-tab" onclick="switchAuth('register')">Registrarse</button>
+  </div>
+  <div class="auth-form">
+    <div class="auth-field" id="usernameField" style="display:none">
+      <div class="auth-label">Nombre de usuario</div>
+      <input class="auth-input" id="authUsername" placeholder="tunombre" maxlength="20" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
+    </div>
+    <div class="auth-field">
+      <div class="auth-label">Email</div>
+      <input class="auth-input" id="authEmail" type="email" placeholder="tu@email.com">
+    </div>
+    <div class="auth-field">
+      <div class="auth-label">Contraseña</div>
+      <input class="auth-input" id="authPassword" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()">
+    </div>
+    <div class="auth-err" id="authErr"></div>
+    <button class="auth-btn" id="authBtn" onclick="doAuth()">ENTRAR →</button>
+  </div>
+</div>
+
+<header class="hdr">
+  <div class="hdr-logo">
+    <div class="hdr-icon">💪</div>
+    <div class="hdr-title">GymTracker</div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-user" onclick="showPage('Perfil',document.querySelector('.nb:nth-child(4)'))">
+      <div id="hdrAvatarWrap"></div>
+      <div class="hdr-username" id="hdrUser">—</div>
+    </div>
+    <div class="week-ctrl">
+      <button class="warr" onclick="changeWeek(-1)">‹</button>
+      <div><div class="wnum-lbl">SEM</div><div class="wnum" id="weekNum">1</div></div>
+      <button class="warr" onclick="changeWeek(1)">›</button>
+    </div>
+  </div>
+</header>
+
+<!-- REGISTRO -->
+<div id="pgRegistro" class="pg active">
+  <div class="cs"><div class="cd sy" id="cdot"></div><span id="ctxt">Conectando...</span></div>
+  <div class="prog-bar"><span class="pl">SEMANA</span><div class="pt"><div class="pf" id="pFill" style="width:0%"></div></div><span class="pc" id="pCount">0/0</span></div>
+  <div class="sr">
+    <div class="sc2"><div class="sn" id="sDone">0</div><div class="sl">Hechos</div></div>
+    <div class="sc2"><div class="sn" id="sVol">0</div><div class="sl">Vol. kg</div></div>
+    <div class="sc2"><div class="sn" id="sRec">0</div><div class="sl">Récords</div></div>
+  </div>
+  <div class="dtabs" id="dayTabs"></div>
+  <div id="dayContent"></div>
+  <div class="timer-p">
+    <div class="th"><div class="tt">Descanso</div>
+      <div class="tpres">
+        <button class="tp" onclick="setTP(60,this)">1min</button>
+        <button class="tp ap" onclick="setTP(90,this)">1:30</button>
+        <button class="tp" onclick="setTP(120,this)">2min</button>
+        <button class="tp" onclick="setTP(180,this)">3min</button>
+      </div>
+    </div>
+    <div class="td" id="tDisp">1:30</div>
+    <div class="ts" id="tSub">listo</div>
+    <div class="ttr"><div class="tf" id="tFill" style="width:100%"></div></div>
+    <div class="tbs">
+      <button class="tmain" id="tBtn" onclick="timerToggle()">INICIAR</button>
+      <button class="tgh" onclick="timerReset()">RESET</button>
+    </div>
+  </div>
+  <div class="save-s">
+    <button class="save-b" onclick="guardarSemana()">📥 GUARDAR SEMANA</button>
+    <div class="save-n">Actualiza récords y publica en el feed.</div>
+  </div>
+</div>
+
+<!-- SOCIAL -->
+<div id="pgSocial" class="pg">
+  <div class="social-hdr">
+    <button class="social-tab active" onclick="switchSocialTab('feed',this)">Feed</button>
+    <button class="social-tab" onclick="switchSocialTab('ranking',this)">Ranking</button>
+    <button class="social-tab" onclick="switchSocialTab('users',this)">Usuarios</button>
+    <button class="social-tab" onclick="switchSocialTab('rutinas',this)">Rutinas</button>
+  </div>
+  <div class="social-section active" id="tabFeed"><div id="feedList"></div></div>
+  <div class="social-section" id="tabRanking">
+    <div class="ranking-hero">
+      <div class="ranking-title">🏆 Ranking</div>
+      <div class="ranking-sub">Compite con tus amigos</div>
+    </div>
+    <div class="rank-tabs">
+      <button class="rank-tab active" onclick="switchRankTab('records',this)">Récords</button>
+      <button class="rank-tab" onclick="switchRankTab('streak',this)">Racha 🔥</button>
+    </div>
+    <div id="rankingList"></div>
+  </div>
+  <div class="social-section" id="tabUsers">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="searchInput" placeholder="Buscar usuarios..." oninput="filterUsers(this.value)">
+    </div>
+    <div id="usersList"></div>
+  </div>
+  <div class="social-section" id="tabRutinas">
+    <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--l)">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--di)">Biblioteca de rutinas</div>
+      <button onclick="openSaveRoutineModal()" style="background:var(--l2);border:1px solid var(--mu);border-radius:20px;padding:6px 14px;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#fff">+ Compartir</button>
+    </div>
+    <div id="rutinasList"></div>
+  </div>
+</div>
+
+<!-- RECORDS -->
+<div id="pgRecords" class="pg">
+  <div class="stit">🏆 Mis Récords</div>
+  <div id="recContent"></div>
+</div>
+
+<!-- PERFIL -->
+<div id="pgPerfil" class="pg">
+  <div id="profileContent"></div>
+</div>
+
+<nav class="bnav">
+  <button class="nb active" onclick="showPage('Registro',this)"><span class="ni">📝</span>Registro</button>
+  <button class="nb" onclick="showPage('Social',this)"><span class="ni">🏟</span>Social</button>
+  <button class="nb" onclick="showPage('Records',this)"><span class="ni">🏆</span>Récords</button>
+  <button class="nb" onclick="showPage('Perfil',this)"><span class="ni">👤</span>Perfil</button>
+</nav>
+
+<!-- USER MODAL -->
+<div class="modal-ov" id="userModal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-tit" id="umName">—</div><button class="mclose" onclick="closeModal('userModal')">✕</button></div>
+    <div id="umContent"></div>
+  </div>
+</div>
+
+<!-- SAVE ROUTINE MODAL -->
+<div class="modal-ov" id="saveRoutineModal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-tit">Guardar Rutina</div><button class="mclose" onclick="closeModal('saveRoutineModal')">✕</button></div>
+    <input class="minput" id="routineName" placeholder="Nombre de la rutina">
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0">
+      <input type="checkbox" id="routinePublic" checked style="width:16px;height:16px">
+      <label for="routinePublic" style="font-size:12px;color:var(--mi)">Hacer pública</label>
+    </div>
+    <button class="mbtn" onclick="doSaveRoutine()">GUARDAR</button>
+    <button class="mbtn ghost" onclick="closeModal('saveRoutineModal')">CANCELAR</button>
+  </div>
+</div>
+
+<!-- ROUTINE DETAIL MODAL -->
+<div class="modal-ov" id="routineModal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-tit" id="rmName">—</div><button class="mclose" onclick="closeModal('routineModal')">✕</button></div>
+    <div id="rmContent"></div>
+    <button class="mbtn" id="rmApplyBtn" style="margin-top:16px">USAR ESTA RUTINA</button>
+    <button class="mbtn ghost" onclick="closeModal('routineModal')">CERRAR</button>
+  </div>
+</div>
+
+<input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
+<div class="toast" id="toast"></div>
+
+<script>
+const SB='https://vijjgrlqdlplwtvlkbzs.supabase.co';
+const SK='sb_publishable_CmWC2tctM8B0K-JaoL5gJQ_qpOg8asj';
+const H={'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application/json'};
+let authToken=null,UID='',UNAME='',AVATAR_URL='';
+
+const api={
+  async auth(action,email,password){
+    const r=await fetch(`${SB}/auth/v1/${action}`,{method:'POST',headers:{'apikey':SK,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+    return await r.json();
+  },
+  async getProfile(uid){try{const r=await fetch(`${SB}/rest/v1/gym_profiles?id=eq.${uid}`,{headers:H});const d=await r.json();return d[0]||null;}catch{return null;}},
+  async upsertProfile(uid,username,extra={}){try{await fetch(`${SB}/rest/v1/gym_profiles`,{method:'POST',headers:{...H,'Prefer':'resolution=merge-duplicates'},body:JSON.stringify({id:uid,username,...extra})});}catch{}},
+  async getAllProfiles(){try{const r=await fetch(`${SB}/rest/v1/gym_profiles?order=created_at`,{headers:H});return await r.json();}catch{return[];}},
+  async getFollows(uid){try{const r=await fetch(`${SB}/rest/v1/gym_follows?follower=eq.${uid}`,{headers:H});const d=await r.json();return d.map(x=>x.following);}catch{return[];}},
+  async getFollowers(uid){try{const r=await fetch(`${SB}/rest/v1/gym_follows?following=eq.${uid}`,{headers:H});const d=await r.json();return d.map(x=>x.follower);}catch{return[];}},
+  async follow(fwr,fwing){try{await fetch(`${SB}/rest/v1/gym_follows`,{method:'POST',headers:{...H,'Prefer':'resolution=merge-duplicates'},body:JSON.stringify({follower:fwr,following:fwing})});}catch{}},
+  async unfollow(fwr,fwing){try{await fetch(`${SB}/rest/v1/gym_follows?follower=eq.${fwr}&following=eq.${fwing}`,{method:'DELETE',headers:H});}catch{}},
+  async getWeekRows(uid,w){try{const r=await fetch(`${SB}/rest/v1/gym_weeks?username=eq.${encodeURIComponent(uid)}&week=eq.${w}`,{headers:H});return await r.json();}catch{return[];}},
+  async setWeekDay(uid,w,dayId,data){try{await fetch(`${SB}/rest/v1/gym_weeks`,{method:'POST',headers:{...H,'Prefer':'resolution=merge-duplicates'},body:JSON.stringify({username:uid,week:w,day_id:dayId,data})});}catch{}},
+  async getUserData(uid){try{const r=await fetch(`${SB}/rest/v1/gym_users?username=eq.${encodeURIComponent(uid)}`,{headers:H});const d=await r.json();return d[0]||null;}catch{return null;}},
+  async upsertUserData(uid,routine){try{await fetch(`${SB}/rest/v1/gym_users`,{method:'POST',headers:{...H,'Prefer':'resolution=merge-duplicates'},body:JSON.stringify({username:uid,routine})});}catch{}},
+  async getRecords(uid){try{const r=await fetch(`${SB}/rest/v1/gym_records?username=eq.${encodeURIComponent(uid)}`,{headers:H});const d=await r.json();return d[0]?d[0].data:{};}catch{return{};}},
+  async setRecords(uid,data){try{await fetch(`${SB}/rest/v1/gym_records`,{method:'POST',headers:{...H,'Prefer':'resolution=merge-duplicates'},body:JSON.stringify({username:uid,data})});}catch{}},
+  async getAllRecords(){try{const r=await fetch(`${SB}/rest/v1/gym_records`,{headers:H});return await r.json();}catch{return[];}},
+  async addActivity(uid,uname,type,data){try{await fetch(`${SB}/rest/v1/gym_activity`,{method:'POST',headers:H,body:JSON.stringify({user_id:uid,username:uname,type,data})});}catch{}},
+  async getAllActivity(){try{const r=await fetch(`${SB}/rest/v1/gym_activity?order=created_at.desc&limit=50`,{headers:H});return await r.json();}catch{return[];}},
+  async getRoutineLibrary(){try{const r=await fetch(`${SB}/rest/v1/gym_routine_library?public=eq.true&order=created_at.desc`,{headers:H});return await r.json();}catch{return[];}},
+  async saveRoutineLib(uid,uname,name,routine,pub){try{await fetch(`${SB}/rest/v1/gym_routine_library`,{method:'POST',headers:H,body:JSON.stringify({user_id:uid,name,routine,public:pub,username:uname})});}catch{}},
+  async uploadAvatar(uid,file){
+    try{
+      const ext=file.name.split('.').pop();
+      const path=`${uid}/avatar.${ext}`;
+      const r=await fetch(`${SB}/storage/v1/object/avatars/${path}`,{method:'POST',headers:{'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':file.type,'x-upsert':'true'},body:file});
+      if(r.ok) return `${SB}/storage/v1/object/public/avatars/${path}?t=${Date.now()}`;
+      return null;
+    }catch{return null;}
+  }
+};
+
+const DEF=[
+  {id:'lunes',name:'Lunes',focus:'Empuje + Cuádriceps',exercises:[
+    {name:'Press de Pecho',series:'3',reps:'6-8'},{name:'Prensa Inclinada',series:'3',reps:'10-12'},
+    {name:'Press Militar',series:'3',reps:'10'},{name:'Extensiones Cuádriceps',series:'3',reps:'15'},
+    {name:'Extensiones Tríceps',series:'3',reps:'12'},{name:'Aperturas Poleas',series:'3',reps:'12'},
+    {name:'Elevaciones Laterales',series:'3',reps:'15'},{name:'Flexiones al fallo',series:'2',reps:'Al fallo'}]},
+  {id:'martes',name:'Martes',focus:'Tirón + Femoral',exercises:[
+    {name:'Jalón al Pecho',series:'3',reps:'8-10'},{name:'Peso Muerto Rumano',series:'3',reps:'10-12'},
+    {name:'Remo Polea Baja',series:'3',reps:'10'},{name:'Curl Femoral',series:'3',reps:'12'},
+    {name:'Curl Bíceps Barra Z',series:'3',reps:'10'},{name:'Pájaros Hombro',series:'3',reps:'15'},
+    {name:'Remo al Mentón',series:'3',reps:'12'},{name:'Curl Martillo',series:'3',reps:'12'}]},
+  {id:'miercoles',name:'Miércoles',focus:'Torso Hipertrofia',exercises:[
+    {name:'Press Inclinado',series:'3',reps:'10-12'},{name:'Elevaciones Laterales Polea',series:'4',reps:'15'},
+    {name:'Jalón Estrecho',series:'3',reps:'10'},{name:'Cruce de Poleas',series:'3',reps:'15'},
+    {name:'Facepull',series:'3',reps:'15'},{name:'Remo Mancuerna',series:'3',reps:'10'},
+    {name:'Press Francés',series:'3',reps:'12'},{name:'Curl Bíceps Polea',series:'3',reps:'12'}]},
+  {id:'jueves',name:'Jueves',focus:'Full Body + Core',exercises:[
+    {name:'Sentadilla / Prensa',series:'3',reps:'10'},{name:'Press Pecho Máquina',series:'3',reps:'10'},
+    {name:'Press Arnold',series:'3',reps:'12'},{name:'Rueda Abdominal',series:'3',reps:'15'},
+    {name:'Elevación Piernas',series:'3',reps:'15'},{name:'Zancadas',series:'2',reps:'12 p.'},
+    {name:'Plancha',series:'3',reps:'1 min'},{name:'Superserie Bíceps/Tríceps',series:'2',reps:'15'}]},
+  {id:'viernes',name:'Viernes',focus:'Piernas + Glúteos',exercises:[
+    {name:'Sentadilla Profunda',series:'4',reps:'10'},{name:'Peso Muerto',series:'3',reps:'8'},
+    {name:'Prensa de Piernas',series:'3',reps:'12'},{name:'Curl Femoral Tumbado',series:'3',reps:'12'},
+    {name:'Hip Thrust',series:'3',reps:'15'},{name:'Extensiones Cuádriceps',series:'3',reps:'15'},
+    {name:'Gemelos de Pie',series:'4',reps:'20'},{name:'Abductores Máquina',series:'3',reps:'15'}]},
+  {id:'sabado',name:'Sábado',focus:'Empuje + Core',exercises:[
+    {name:'Press Banca Plano',series:'4',reps:'8-10'},{name:'Press Hombro Máquina',series:'3',reps:'10'},
+    {name:'Fondos en Paralelas',series:'3',reps:'Al fallo'},{name:'Cruce de Poleas Alto',series:'3',reps:'12'},
+    {name:'Elevaciones Laterales',series:'4',reps:'15'},{name:'Plancha',series:'3',reps:'1 min'},
+    {name:'Rueda Abdominal',series:'3',reps:'12'},{name:'Crunch en Polea',series:'3',reps:'15'}]},
+  {id:'domingo',name:'Domingo',focus:'Descanso Activo',exercises:[
+    {name:'Cardio Suave',series:'1',reps:'30 min'},{name:'Estiramiento Isquiotibiales',series:'3',reps:'30 seg'},
+    {name:'Estiramiento Cuádriceps',series:'3',reps:'30 seg'},{name:'Foam Roller Espalda',series:'1',reps:'5 min'},
+    {name:'Movilidad de Cadera',series:'3',reps:'10'},{name:'Estiramiento Hombros',series:'3',reps:'30 seg'},
+    {name:'Respiración Diafragmática',series:'1',reps:'5 min'},{name:'Meditación / Descanso',series:'1',reps:'10 min'}]}
+];
+
+let ROUTINE=JSON.parse(JSON.stringify(DEF));
+let WEEKS={},RECORDS={},FOLLOWS=[],FOLLOWERS=[];
+let currentWeek=1,activeDay=0,activePage='Registro',activeSocialTab='feed',activeRankTab='records';
+let timerTotal=90,timerLeft=90,timerRunning=false,timerInt=null;
+let allUsersCache=[],allRecordsCache=[];
+
+// ── AUTH ──────────────────────────────────────────────
+let authMode='login';
+function switchAuth(mode){
+  authMode=mode;
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(mode==='login'&&i===0)||(mode==='register'&&i===1)));
+  document.getElementById('usernameField').style.display=mode==='register'?'flex':'none';
+  document.getElementById('authBtn').textContent=mode==='login'?'ENTRAR →':'CREAR CUENTA →';
+  document.getElementById('authErr').textContent='';
+}
+
+async function doAuth(){
+  const email=document.getElementById('authEmail').value.trim();
+  const password=document.getElementById('authPassword').value;
+  const username=document.getElementById('authUsername').value.trim();
+  if(!email||!password){showErr('Rellena todos los campos');return;}
+  if(authMode==='register'&&!username){showErr('Elige un nombre de usuario');return;}
+  const btn=document.getElementById('authBtn');btn.disabled=true;btn.textContent='...';
+  const action=authMode==='login'?'token?grant_type=password':'signup';
+  const res=await api.auth(action,email,password);
+  if(res.error){showErr(res.error.message||'Error');btn.disabled=false;btn.textContent=authMode==='login'?'ENTRAR →':'CREAR CUENTA →';return;}
+  authToken=res.access_token||res.session?.access_token;
+  UID=res.user?.id||res.session?.user?.id;
+  if(authMode==='register'){
+    await api.upsertProfile(UID,username);UNAME=username;
+  } else {
+    const prof=await api.getProfile(UID);
+    UNAME=prof?prof.username:email.split('@')[0];
+    AVATAR_URL=prof?.avatar_url||'';
+  }
+  localStorage.setItem('gymSession',JSON.stringify({authToken,UID,UNAME,AVATAR_URL}));
+  await loadUserData();
+}
+
+function showErr(msg){document.getElementById('authErr').textContent=msg;}
+
+async function doLogout(){
+  localStorage.removeItem('gymSession');
+  authToken=null;UID='';UNAME='';AVATAR_URL='';WEEKS={};RECORDS={};FOLLOWS=[];currentWeek=1;
+  document.getElementById('authScreen').classList.add('show');
+  document.getElementById('authEmail').value='';document.getElementById('authPassword').value='';
+}
+
+// ── AVATAR ────────────────────────────────────────────
+function renderHdrAvatar(){
+  const wrap=document.getElementById('hdrAvatarWrap');
+  if(AVATAR_URL){wrap.innerHTML=`<img class="hdr-avatar" src="${AVATAR_URL}" onerror="this.style.display='none'">`;}
+  else{wrap.innerHTML=`<div class="hdr-avatar-placeholder" style="background:${avatarColor(UNAME)}">${(UNAME||'?')[0].toUpperCase()}</div>`;}
+}
+
+async function uploadAvatar(input){
+  const file=input.files[0];if(!file)return;
+  showToast('SUBIENDO FOTO...');
+  const url=await api.uploadAvatar(UID,file);
+  if(url){
+    AVATAR_URL=url;
+    await api.upsertProfile(UID,UNAME,{avatar_url:url});
+    localStorage.setItem('gymSession',JSON.stringify({authToken,UID,UNAME,AVATAR_URL}));
+    renderHdrAvatar();
+    renderProfile();
+    showToast('✅ FOTO ACTUALIZADA');
+  } else showToast('ERROR AL SUBIR');
+}
+
+function avatarEl(url,name,size=40,cls=''){
+  if(url) return `<img src="${url}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:1px solid var(--l2);flex-shrink:0" onerror="this.style.display='none'" class="${cls}">`;
+  return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${avatarColor(name)};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:${Math.round(size*0.4)}px;text-transform:uppercase;flex-shrink:0;border:1px solid var(--l2)" class="${cls}">${(name||'?')[0].toUpperCase()}</div>`;
+}
+
+// ── LOAD USER DATA ────────────────────────────────────
+async function loadUserData(){
+  document.getElementById('authScreen').classList.remove('show');
+  setCS('sy','Cargando...');
+  const [userData,recs,follows,followers,prof]=await Promise.all([
+    api.getUserData(UID),api.getRecords(UID),api.getFollows(UID),api.getFollowers(UID),api.getProfile(UID)
+  ]);
+  if(prof&&prof.avatar_url){AVATAR_URL=prof.avatar_url;localStorage.setItem('gymSession',JSON.stringify({authToken,UID,UNAME,AVATAR_URL}));}
+  if(userData&&userData.routine){
+    const existingIds=userData.routine.map(d=>d.id);
+    ROUTINE=userData.routine;
+    DEF.forEach(defDay=>{if(!existingIds.includes(defDay.id))ROUTINE.push(defDay);});
+    if(ROUTINE.length>userData.routine.length)await api.upsertUserData(UID,ROUTINE);
+  } else{ROUTINE=JSON.parse(JSON.stringify(DEF));await api.upsertUserData(UID,ROUTINE);}
+  RECORDS=recs||{};FOLLOWS=follows||[];FOLLOWERS=followers||[];
+  const rows=await api.getWeekRows(UID,currentWeek);
+  if(rows.length){WEEKS[currentWeek]={};rows.forEach(r=>{WEEKS[currentWeek][r.day_id]=r.data;});}
+  document.getElementById('hdrUser').textContent=UNAME;
+  renderHdrAvatar();
+  setCS('ok','Conectado · '+UNAME);
+  render();
+}
+
+// ── WEEK DATA ─────────────────────────────────────────
+function getWD(){
+  const w=currentWeek;
+  if(!WEEKS[w]){WEEKS[w]={};ROUTINE.forEach(d=>{WEEKS[w][d.id]=d.exercises.map(()=>({kg:'',reps:'',notes:'',done:false}));});}
+  ROUTINE.forEach(d=>{
+    if(!WEEKS[w][d.id])WEEKS[w][d.id]=d.exercises.map(()=>({kg:'',reps:'',notes:'',done:false}));
+    while(WEEKS[w][d.id].length<d.exercises.length)WEEKS[w][d.id].push({kg:'',reps:'',notes:'',done:false});
+  });
+  return WEEKS[w];
+}
+
+// ── TIMER ─────────────────────────────────────────────
+function setTP(s,btn){timerReset();timerTotal=s;timerLeft=s;document.querySelectorAll('.tp').forEach(b=>b.classList.remove('ap'));if(btn)btn.classList.add('ap');updTimer();}
+function timerToggle(){
+  if(timerRunning){clearInterval(timerInt);timerRunning=false;document.getElementById('tBtn').textContent='INICIAR';}
+  else{if(timerLeft<=0)timerLeft=timerTotal;timerRunning=true;document.getElementById('tBtn').textContent='PAUSAR';
+    timerInt=setInterval(()=>{timerLeft--;updTimer();if(timerLeft<=0){clearInterval(timerInt);timerRunning=false;document.getElementById('tBtn').textContent='INICIAR';document.getElementById('tSub').textContent='¡a por otra serie!';}},1000);}
+}
+function timerReset(){clearInterval(timerInt);timerRunning=false;timerLeft=timerTotal;document.getElementById('tBtn').textContent='INICIAR';updTimer();}
+function updTimer(){
+  const m=Math.floor(timerLeft/60),s=timerLeft%60;
+  document.getElementById('tDisp').textContent=m+':'+(s<10?'0':'')+s;
+  document.getElementById('tFill').style.width=(timerLeft/timerTotal*100)+'%';
+  document.getElementById('tSub').textContent=timerRunning?'descansando...':(timerLeft===timerTotal?'listo':'pausado');
+}
+
+// ── RENDER REGISTRO ───────────────────────────────────
+function render(){
+  document.getElementById('weekNum').textContent=currentWeek;
+  renderStats();renderTabs();renderDay();
+}
+
+function renderStats(){
+  const w=getWD();let done=0,total=0,vol=0;
+  ROUTINE.forEach(d=>d.exercises.forEach((ex,i)=>{total++;const e=w[d.id]&&w[d.id][i];if(e&&e.done)done++;if(e&&e.kg)vol+=parseFloat(e.kg)||0;}));
+  document.getElementById('pFill').style.width=(total?done/total*100:0)+'%';
+  document.getElementById('pCount').textContent=done+'/'+total;
+  document.getElementById('sDone').textContent=done;
+  document.getElementById('sVol').textContent=Math.round(vol);
+  document.getElementById('sRec').textContent=Object.values(RECORDS).filter(r=>r.week==currentWeek).length;
+}
+
+function renderTabs(){
+  const w=getWD();
+  document.getElementById('dayTabs').innerHTML=ROUTINE.map((d,i)=>{
+    const done=w[d.id]?w[d.id].filter(e=>e.done).length:0;
+    return `<button class="dt ${i===activeDay?'active':''}" onclick="setDay(${i})">${d.name}<span class="dp">${done}/${d.exercises.length}</span></button>`;
+  }).join('');
+}
+
+function renderDay(){
+  const day=ROUTINE[activeDay];if(!day)return;
+  const w=getWD(),exArr=w[day.id],done=exArr?exArr.filter(e=>e.done).length:0;
+  let h=`<div class="dhdr"><div><div class="dname">${day.name}</div><div class="dfocus">${day.focus||''}</div></div>
+    <div class="dcnt"><div class="dcnt-n">${done}<span style="color:var(--mu);font-size:20px">/${day.exercises.length}</span></div><div class="dcnt-l">completados</div></div>
+  </div><div class="exl">`;
+  day.exercises.forEach((ex,i)=>{
+    const e=(exArr&&exArr[i])?exArr[i]:{kg:'',reps:'',notes:'',done:false};
+    const rec=RECORDS[day.id+'_'+ex.name];
+    h+=`<div class="exc ${e.done?'done':''}" id="ec_${activeDay}_${i}">
+      <div class="exn2">${String(i+1).padStart(2,'0')}</div>
+      <div class="exb"><div class="exname">${ex.name}</div>
+        <div class="extags"><span class="xt hi">${ex.series}×${ex.reps}</span>${rec?`<span class="xt rec">· 🏆${rec.kg}kg</span>`:''}</div>
+      </div>
+      <div class="exinps">
+        <div class="xiw"><div class="xil">KG</div><input type="number" inputmode="decimal" step="0.5" class="xi ${e.kg?'hv':''}" placeholder="—" value="${e.kg}" onchange="updF(${activeDay},${i},'kg',this.value)" oninput="this.classList.toggle('hv',!!this.value)"></div>
+        <div class="xiw"><div class="xil">REPS</div><input type="text" inputmode="numeric" class="xi ${e.reps?'hv':''}" placeholder="—" value="${e.reps}" onchange="updF(${activeDay},${i},'reps',this.value)" oninput="this.classList.toggle('hv',!!this.value)"></div>
+      </div>
+      <button class="ckb" id="ck_${activeDay}_${i}" onclick="toggleDone(${activeDay},${i})">${e.done?'✓':''}</button>
+    </div>
+    <div class="enr ${e.done?'done':''}" id="nr_${activeDay}_${i}">
+      <input type="text" class="eni ${e.notes?'hv':''}" placeholder="Nota…" value="${e.notes||''}" onchange="updF(${activeDay},${i},'notes',this.value)" oninput="this.classList.toggle('hv',!!this.value)">
+      <button onclick="delExercise(${activeDay},${i})" style="font-size:11px;color:var(--mu);margin-left:8px" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='var(--mu)'">✕</button>
+    </div>`;
+  });
+  h+=`</div><button class="add-ex" onclick="addExercise(${activeDay})">+ Añadir ejercicio</button>`;
+  document.getElementById('dayContent').innerHTML=h;
+}
+
+function setDay(i){activeDay=i;renderTabs();renderDay();}
+
+async function changeWeek(d){
+  const n=currentWeek+d;if(n<1)return;currentWeek=n;
+  if(!WEEKS[n]){const rows=await api.getWeekRows(UID,n);if(rows.length){WEEKS[n]={};rows.forEach(r=>{WEEKS[n][r.day_id]=r.data;});}}
+  render();
+}
+
+function toggleDone(di,ei){
+  const day=ROUTINE[di],w=getWD();w[day.id][ei].done=!w[day.id][ei].done;
+  renderStats();renderTabs();
+  const isDone=w[day.id][ei].done;
+  document.getElementById(`ec_${di}_${ei}`)?.classList.toggle('done',isDone);
+  document.getElementById(`nr_${di}_${ei}`)?.classList.toggle('done',isDone);
+  const ck=document.getElementById(`ck_${di}_${ei}`);if(ck)ck.textContent=isDone?'✓':'';
+  const cnt=document.querySelector('.dcnt-n');
+  if(cnt)cnt.innerHTML=w[day.id].filter(e=>e.done).length+'<span style="color:var(--mu);font-size:20px">/'+day.exercises.length+'</span>';
+  autoSave(di);
+}
+
+function updF(di,ei,field,val){
+  const w=getWD();if(!w[ROUTINE[di].id][ei])w[ROUTINE[di].id][ei]={kg:'',reps:'',notes:'',done:false};
+  w[ROUTINE[di].id][ei][field]=val;if(field==='kg')renderStats();autoSave(di);
+}
+
+let saveT={};
+function autoSave(di){
+  clearTimeout(saveT[di]);
+  saveT[di]=setTimeout(async()=>{
+    const day=ROUTINE[di],w=getWD();setCS('sy','Guardando...');
+    await api.setWeekDay(UID,currentWeek,day.id,w[day.id]);
+    setCS('ok','Guardado · '+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}));
+  },1500);
+}
+
+function addExercise(di){
+  const name=prompt('Nombre del ejercicio:');if(!name?.trim())return;
+  const series=prompt('¿Cuántas series?','3')||'3';
+  const reps=prompt('¿Cuántas reps?','10')||'10';
+  ROUTINE[di].exercises.push({name:name.trim(),series,reps});
+  getWD()[ROUTINE[di].id].push({kg:'',reps:'',notes:'',done:false});
+  api.upsertUserData(UID,ROUTINE);renderDay();renderTabs();showToast('✅ AÑADIDO');
+}
+
+function delExercise(di,ei){
+  if(!confirm('¿Eliminar?'))return;
+  ROUTINE[di].exercises.splice(ei,1);getWD()[ROUTINE[di].id].splice(ei,1);
+  api.upsertUserData(UID,ROUTINE);renderDay();renderTabs();
+}
+
+async function guardarSemana(){
+  const week=currentWeek,date=new Date().toLocaleDateString('es-ES'),w=getWD();
+  setCS('sy','Guardando...');
+  let vol=0,done=0,total=0;
+  ROUTINE.forEach(day=>{
+    w[day.id].forEach(e=>{total++;if(e.done)done++;if(e.kg)vol+=parseFloat(e.kg)||0;});
+    day.exercises.forEach((ex,i)=>{
+      const e=w[day.id][i]||{};
+      if(e.kg&&parseFloat(e.kg)>0){const key=day.id+'_'+ex.name;const cur=RECORDS[key];if(!cur||parseFloat(e.kg)>=parseFloat(cur.kg))RECORDS[key]={kg:e.kg,week,date};}
+    });
+  });
+  // Calculate streak
+  const streak=Object.keys(WEEKS).filter(w=>{ const wd=WEEKS[w];return ROUTINE.some(d=>wd[d.id]&&wd[d.id].some(e=>e.done)); }).length;
+  await Promise.all([
+    ...ROUTINE.map(day=>api.setWeekDay(UID,week,day.id,w[day.id])),
+    api.setRecords(UID,RECORDS),
+    api.upsertProfile(UID,UNAME,{streak,total_weeks:streak}),
+    api.addActivity(UID,UNAME,'workout',{week,date,done,total,vol:Math.round(vol),recs:Object.keys(RECORDS).length,avatar:AVATAR_URL})
+  ]);
+  setCS('ok','Semana guardada ✓');
+  showToast('✅ SEMANA '+week+' GUARDADA');renderStats();
+}
+
+// ── SOCIAL ────────────────────────────────────────────
+function switchSocialTab(tab,btn){
+  activeSocialTab=tab;
+  document.querySelectorAll('.social-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.social-section').forEach(s=>s.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.getElementById('tab'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
+  if(tab==='feed')loadFeed();
+  if(tab==='ranking')loadRanking();
+  if(tab==='users')loadUsers();
+  if(tab==='rutinas')loadRutinas();
+}
+
+function switchRankTab(tab,btn){
+  activeRankTab=tab;
+  document.querySelectorAll('.rank-tab').forEach(t=>t.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderRanking();
+}
+
+async function loadFeed(){
+  document.getElementById('feedList').innerHTML='<div class="feed-empty">Cargando...</div>';
+  const acts=await api.getAllActivity();
+  const toShow=[UID,...FOLLOWS];
+  const filtered=acts.filter(a=>toShow.includes(a.user_id));
+  if(!filtered.length){document.getElementById('feedList').innerHTML='<div class="feed-empty">🏋️ Sigue a amigos para ver su actividad</div>';return;}
+  document.getElementById('feedList').innerHTML=filtered.map(a=>{
+    const d=a.data||{};
+    const time=new Date(a.created_at).toLocaleDateString('es-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const av=avatarEl(d.avatar||'',a.username,40);
+    return `<div class="feed-item" onclick="openUserModal('${a.user_id}','${a.username}')">
+      ${av}
+      <div class="feed-body">
+        <div class="feed-header"><span class="feed-user">${a.username||'—'}</span><span class="feed-time">${time}</span></div>
+        <div class="feed-text">completó la semana ${d.week||''} · ${d.done||0}/${d.total||0} ejercicios</div>
+        <div class="feed-stats">
+          <div class="feed-stat">Vol: <span>${d.vol||0} kg</span></div>
+          <div class="feed-stat">Récords: <span>${d.recs||0}</span></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadRanking(){
+  if(!allUsersCache.length)allUsersCache=await api.getAllProfiles();
+  if(!allRecordsCache.length)allRecordsCache=await api.getAllRecords();
+  renderRanking();
+}
+
+function renderRanking(){
+  const profMap={};allUsersCache.forEach(p=>{profMap[p.id]={username:p.username,avatar:p.avatar_url||'',streak:p.streak||0,total_weeks:p.total_weeks||0};});
+  const recsMap={};allRecordsCache.forEach(r=>{recsMap[r.username]=Object.keys(r.data||{}).length;});
+  const toShow=[UID,...FOLLOWS];
+  let ranked=allUsersCache.filter(p=>toShow.includes(p.id)).map(p=>({
+    uid:p.id,name:p.username,avatar:p.avatar_url||'',
+    recs:recsMap[p.id]||0,streak:p.streak||0
+  }));
+  if(activeRankTab==='records') ranked.sort((a,b)=>b.recs-a.recs);
+  else ranked.sort((a,b)=>b.streak-a.streak);
+  if(!ranked.length){document.getElementById('rankingList').innerHTML='<div class="feed-empty">Sigue a amigos para ver el ranking</div>';return;}
+  const medals=['g','s','b'];
+  document.getElementById('rankingList').innerHTML=ranked.map((u,i)=>`
+    <div class="rank-row ${u.uid===UID?'me':''}" onclick="openUserModal('${u.uid}','${u.name}')">
+      <div class="rank-pos ${medals[i]||''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+      ${avatarEl(u.avatar,u.name,44)}
+      <div class="rank-info">
+        <div class="rank-name">${u.name}${u.uid===UID?'<span class="rank-badge">TÚ</span>':''}</div>
+        ${activeRankTab==='streak'?`<div class="rank-streak"><span class="streak-fire">🔥</span>${u.streak} semanas seguidas</div>`:`<div class="rank-meta">${u.recs} récords totales</div>`}
+      </div>
+      <div class="rank-score">
+        <div class="rank-val">${activeRankTab==='records'?u.recs:u.streak}</div>
+        <div class="rank-unit">${activeRankTab==='records'?'recs':'semanas'}</div>
+      </div>
+    </div>`).join('');
+}
+
+let allUsersForSearch=[];
+async function loadUsers(){
+  document.getElementById('usersList').innerHTML='<div class="feed-empty">Cargando...</div>';
+  allUsersForSearch=await api.getAllProfiles();
+  allUsersCache=allUsersForSearch;
+  renderUsersList(allUsersForSearch);
+}
+
+function filterUsers(q){
+  if(!allUsersForSearch.length)return;
+  const filtered=q?allUsersForSearch.filter(p=>p.username.toLowerCase().includes(q.toLowerCase())):allUsersForSearch;
+  renderUsersList(filtered);
+}
+
+function renderUsersList(users){
+  const others=users.filter(p=>p.id!==UID);
+  if(!others.length){document.getElementById('usersList').innerHTML='<div class="feed-empty">Sin usuarios</div>';return;}
+  document.getElementById('usersList').innerHTML=others.map(p=>{
+    const isF=FOLLOWS.includes(p.id);
+    return `<div class="user-row">
+      <div onclick="openUserModal('${p.id}','${p.username}')">${avatarEl(p.avatar_url||'',p.username,44)}</div>
+      <div class="u-info" onclick="openUserModal('${p.id}','${p.username}')">
+        <div class="u-name">${p.username}</div>
+        <div class="u-meta">${isF?'✓ Siguiendo':'Toca para ver perfil'}</div>
+      </div>
+      <button class="follow-btn ${isF?'following':''}" onclick="toggleFollow('${p.id}','${p.username}',this)">${isF?'Siguiendo':'+ Seguir'}</button>
+    </div>`;
+  }).join('');
+}
+
+async function toggleFollow(uid,uname,btn){
+  const isF=FOLLOWS.includes(uid);
+  if(isF){await api.unfollow(UID,uid);FOLLOWS=FOLLOWS.filter(x=>x!==uid);}
+  else{await api.follow(UID,uid);FOLLOWS.push(uid);}
+  btn.textContent=isF?'+ Seguir':'Siguiendo';
+  btn.classList.toggle('following',!isF);
+  btn.nextSibling;
+  const metaEl=btn.previousElementSibling?.querySelector('.u-meta');
+  if(metaEl)metaEl.textContent=isF?'Toca para ver perfil':'✓ Siguiendo';
+  showToast(isF?'Dejaste de seguir a '+uname:'Ahora sigues a '+uname);
+}
+
+async function loadRutinas(){
+  document.getElementById('rutinasList').innerHTML='<div class="feed-empty">Cargando...</div>';
+  const routines=await api.getRoutineLibrary();
+  if(!routines.length){document.getElementById('rutinasList').innerHTML='<div class="feed-empty">Sé el primero en compartir 💪</div>';return;}
+  document.getElementById('rutinasList').innerHTML=routines.map(r=>`
+    <div class="routine-card">
+      <div class="rc-header"><div class="rc-name">${r.name}</div><div class="rc-author">por ${r.username||'—'}</div></div>
+      <div class="rc-days">${(r.routine||[]).map(d=>`<span class="rc-day">${d.name}</span>`).join('')}</div>
+      <div class="rc-actions">
+        <button class="rc-btn" onclick='openRoutineModal(${JSON.stringify(r)})'>Ver</button>
+        <button class="rc-btn primary" onclick='applyRoutine(${JSON.stringify(r.routine)})'>Usar</button>
+      </div>
+    </div>`).join('');
+}
+
+function openRoutineModal(r){
+  document.getElementById('rmName').textContent=r.name;
+  document.getElementById('rmContent').innerHTML=(r.routine||[]).map(day=>`
+    <div style="margin-bottom:12px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--di);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--l)">${day.name}</div>
+      ${day.exercises.map(ex=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--l);font-size:13px"><span style="color:var(--mi)">${ex.name}</span><span style="color:var(--di)">${ex.series}×${ex.reps}</span></div>`).join('')}
+    </div>`).join('');
+  document.getElementById('rmApplyBtn').onclick=()=>applyRoutine(r.routine);
+  document.getElementById('routineModal').classList.add('open');
+}
+
+function applyRoutine(routine){
+  if(!confirm('¿Aplicar esta rutina?'))return;
+  ROUTINE=JSON.parse(typeof routine==='string'?routine:JSON.stringify(routine));
+  api.upsertUserData(UID,ROUTINE);closeModal('routineModal');render();showToast('✅ RUTINA APLICADA');
+}
+
+function openSaveRoutineModal(){
+  document.getElementById('routineName').value='Mi rutina';
+  document.getElementById('saveRoutineModal').classList.add('open');
+}
+
+async function doSaveRoutine(){
+  const name=document.getElementById('routineName').value.trim();
+  if(!name)return;
+  const pub=document.getElementById('routinePublic').checked;
+  await api.saveRoutineLib(UID,UNAME,name,ROUTINE,pub);
+  closeModal('saveRoutineModal');showToast('✅ RUTINA GUARDADA');loadRutinas();
+}
+
+// ── USER MODAL ────────────────────────────────────────
+async function openUserModal(uid,uname){
+  document.getElementById('umName').textContent=uname;
+  document.getElementById('umContent').innerHTML='<div style="color:var(--di);font-size:11px;padding:12px 0">Cargando...</div>';
+  document.getElementById('userModal').classList.add('open');
+  const [userData,recs,prof,follows,followers]=await Promise.all([
+    api.getUserData(uid),api.getRecords(uid),api.getProfile(uid),api.getFollows(uid),api.getFollowers(uid)
+  ]);
+  const routine=userData?.routine||[];
+  const recEntries=Object.entries(recs);
+  const isF=FOLLOWS.includes(uid);
+  const av=prof?.avatar_url||'';
+  document.getElementById('umContent').innerHTML=`
+    <div class="um-cover" style="background:linear-gradient(135deg,${avatarColor(uname)},#2a2a2a)">
+      ${av?`<img class="um-avatar" src="${av}">`:`<div class="um-avatar-ph" style="background:${avatarColor(uname)}">${(uname||'?')[0].toUpperCase()}</div>`}
+    </div>
+    <div class="um-stats">
+      <div class="um-stat"><div class="um-stat-n">${follows.length}</div><div class="um-stat-l">Siguiendo</div></div>
+      <div class="um-stat"><div class="um-stat-n">${followers.length}</div><div class="um-stat-l">Seguidores</div></div>
+      <div class="um-stat"><div class="um-stat-n">${recEntries.length}</div><div class="um-stat-l">Récords</div></div>
+    </div>
+    ${uid!==UID?`<button onclick="toggleFollow('${uid}','${uname}',this);document.getElementById('userModal').querySelector('.follow-btn').textContent=this.textContent" class="follow-btn ${isF?'following':''}" style="width:100%;padding:12px;margin-bottom:14px;border-radius:3px;font-size:12px">${isF?'Siguiendo':'+ Seguir'}</button>`:''}
+    ${prof?.streak?`<div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--l);margin-bottom:10px"><span style="font-size:20px">🔥</span><span style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px">${prof.streak}</span><span style="font-size:10px;color:var(--di);letter-spacing:2px;text-transform:uppercase">semanas de racha</span></div>`:''}
+    <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--di);margin:10px 0 7px">Rutina (${routine.reduce((a,d)=>a+d.exercises.length,0)} ejercicios)</div>
+    ${routine.map(day=>`
+      <div style="margin-bottom:10px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--di);margin-bottom:5px">${day.name}</div>
+        ${day.exercises.map(ex=>`<div style="font-size:12px;color:var(--mi);padding:3px 0;border-bottom:1px solid var(--l)">${ex.name} <span style="color:var(--di)">${ex.series}×${ex.reps}</span></div>`).join('')}
+      </div>`).join('')}
+    <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--di);margin:10px 0 7px">Top Récords</div>
+    ${recEntries.length?recEntries.sort((a,b)=>parseFloat(b[1].kg)-parseFloat(a[1].kg)).slice(0,8).map(([k,v])=>`
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--l);font-size:12px">
+        <span style="color:var(--mi)">${k.split('_').slice(1).join(' ')}</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px">${v.kg} kg</span>
+      </div>`).join(''):'<div style="color:var(--di);font-size:11px">Sin récords aún</div>'}`;
+}
+
+// ── RECORDS ───────────────────────────────────────────
+function renderRecords(){
+  let h='';ROUTINE.forEach(day=>{
+    h+=`<div class="rec-day-h">${day.name.toUpperCase()}</div><div class="rec-grid">`;
+    day.exercises.forEach(ex=>{const rec=RECORDS[day.id+'_'+ex.name];h+=`<div class="rc2"><div class="rc2-ex">${ex.name}</div>${rec?`<div class="rc2-kg">${rec.kg}<span style="font-size:12px;color:var(--di);font-weight:400"> kg</span></div><div class="rc2-meta">SEM ${rec.week} · ${rec.date}</div>`:`<div class="rc2-kg empty">—</div>`}</div>`;});
+    h+=`</div>`;
+  });
+  document.getElementById('recContent').innerHTML=h;
+}
+
+// ── PROFILE ───────────────────────────────────────────
+async function renderProfile(){
+  const recCount=Object.keys(RECORDS).length;
+  const prof=await api.getProfile(UID);
+  const streak=prof?.streak||0;
+  const followers=await api.getFollowers(UID);
+  document.getElementById('profileContent').innerHTML=`
+    <div class="profile-cover" style="background:linear-gradient(135deg,${avatarColor(UNAME)},#2a2a2a)">
+      <div class="profile-avatar-wrap">
+        ${AVATAR_URL?`<img class="profile-avatar-img" src="${AVATAR_URL}">`:`<div class="profile-avatar-ph" style="background:${avatarColor(UNAME)}">${UNAME[0].toUpperCase()}</div>`}
+        <div class="profile-upload-btn" onclick="document.getElementById('avatarInput').click()">📷</div>
+      </div>
+    </div>
+    <div class="profile-info">
+      <div class="profile-name">${UNAME}</div>
+      ${streak?`<div style="font-size:11px;color:var(--di);margin-top:4px;letter-spacing:1px">🔥 ${streak} semanas de racha</div>`:''}
+    </div>
+    <div class="profile-nums">
+      <div class="pnum"><div class="pnum-n">${FOLLOWS.length}</div><div class="pnum-l">Siguiendo</div></div>
+      <div class="pnum"><div class="pnum-n">${followers.length}</div><div class="pnum-l">Seguidores</div></div>
+      <div class="pnum"><div class="pnum-n">${recCount}</div><div class="pnum-l">Récords</div></div>
+    </div>
+    ${streak?`<div class="profile-streak"><span style="font-size:28px">🔥</span><div><div class="streak-count">${streak}</div><div class="streak-label">semanas de racha</div></div></div>`:''}
+    <div style="padding:14px 18px;border-bottom:1px solid var(--l);display:flex;gap:10px">
+      <button onclick="document.getElementById('avatarInput').click()" style="flex:1;background:var(--l2);border:1px solid var(--mu);border-radius:3px;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#fff">📷 Cambiar foto</button>
+      <button onclick="openSaveRoutineModal()" style="flex:1;background:var(--l2);border:1px solid var(--mu);border-radius:3px;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#fff">💾 Compartir rutina</button>
+    </div>
+    ${ROUTINE.map(day=>`
+      <div style="padding:10px 18px;border-bottom:1px solid var(--l)">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--di);margin-bottom:7px">${day.name} — ${day.focus||''}</div>
+        ${day.exercises.map(ex=>`<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mi);padding:3px 0;border-bottom:1px solid var(--l)">${ex.name}<span style="color:var(--di)">${ex.series}×${ex.reps}</span></div>`).join('')}
+      </div>`).join('')}
+    <div style="padding:14px 18px">
+      <button onclick="doLogout()" style="background:none;border:1px solid var(--l2);border-radius:3px;padding:12px;width:100%;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--di)">CERRAR SESIÓN</button>
+    </div>`;
+}
+
+// ── NAVIGATION ────────────────────────────────────────
+function showPage(page,btn){
+  activePage=page;
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pg'+page).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(page==='Social'){allUsersCache=[];allRecordsCache=[];loadFeed();}
+  if(page==='Records')renderRecords();
+  if(page==='Perfil')renderProfile();
+  window.scrollTo(0,0);
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// ── UTILS ─────────────────────────────────────────────
+function setCS(s,msg){document.getElementById('cdot').className='cd '+s;document.getElementById('ctxt').textContent=msg;}
+function avatarColor(name){const c=['#1a1a2e','#16213e','#0f3460','#1b1b2f','#2c2c54','#1a1a3e','#1f1b33','#2d1b33','#0d1b2a','#1c0f2e'];let h=0;for(let i=0;i<(name||'').length;i++)h=(h+name.charCodeAt(i)*31)%c.length;return c[h];}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+
+// ── PWA ───────────────────────────────────────────────
+const manifest={name:'Gym Tracker',short_name:'GymTracker',start_url:'/',display:'standalone',background_color:'#000',theme_color:'#000',icons:[{src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%23000"/><text y=".9em" font-size="80">💪</text></svg>',sizes:'512x512',type:'image/svg+xml'}]};
+const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+const ml=document.createElement('link');ml.rel='manifest';ml.href=URL.createObjectURL(blob);document.head.appendChild(ml);
+
+// ── INIT ──────────────────────────────────────────────
+async function init(){
+  const saved=localStorage.getItem('gymSession');
+  if(saved){
+    try{
+      const sess=JSON.parse(saved);
+      authToken=sess.authToken;UID=sess.UID;UNAME=sess.UNAME;AVATAR_URL=sess.AVATAR_URL||'';
+      document.getElementById('splashTxt').textContent='Hola '+UNAME+'...';
+      setTimeout(async()=>{document.getElementById('splash').classList.add('out');await loadUserData();},800);
+      return;
+    }catch{}
+  }
+  setTimeout(()=>{document.getElementById('splash').classList.add('out');document.getElementById('authScreen').classList.add('show');},1200);
+}
+init();
+</script>
+</body>
+</html>
